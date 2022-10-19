@@ -66,7 +66,6 @@ function Criartarefa(Nome_Tarefa, vetor){
                 RemoveDaLista(Botao2.id);
                 RemoveHTML(Botao2.id);
             }, 450);
-            
         });
         // Div que contém todo o HTML criado
         let Div = document.createElement('div');
@@ -103,38 +102,45 @@ function RemoveHTML(Id){
 }
 // Filtro 
 const filtro = document.querySelector('#Filtro');
+    Filtred = []
     filtro.addEventListener('change', ()=>{
         if(filtro.value === 'all'){
-            for(let i = 0; i < ListaTarefas.length; i++){
-                Div = document.querySelector('#Div'+ListaTarefas[i].id);
+            // Remove a classe que oculta o HTML de todos os itens caso tenha
+            Filtred = ListaTarefas;
+            Filtred.forEach(linha =>{
+                Div = document.querySelector('#Div'+linha.id);
                 Div.classList.remove('ocult');
-            }
+            });
         }
         else{
             if(filtro.value === 'completed'){
-                for(let i = 0; i < ListaTarefas.length; i++){
-                    if(ListaTarefas[i].Status == 'uncompleted'){
-                        Div = document.querySelector('#Div'+ListaTarefas[i].id);
-                        Div.classList.add('ocult');
-                    }
-                    if(ListaTarefas[i].Status == 'completed'){
-                        Div = document.querySelector('#Div'+ListaTarefas[i].id);
-                        Div.classList.remove('ocult');
-                    }
-                }
+                // Adciona a classe para remover a ocultar todas as tarefas
+                Filtred = ListaTarefas;
+                Filtred.forEach(linha =>{
+                    Div = document.querySelector('#Div'+linha.id);
+                    Div.classList.add('ocult');
+                })
+                // Remove a classe que oculta o HTML somente dos completados
+                Filtred = ListaTarefas.filter(element => element.Status == 'completed');
+                Filtred.forEach(linha =>{
+                    Div = document.querySelector('#Div'+linha.id);
+                    Div.classList.remove('ocult');
+                });
             }
             else{
                 if(filtro.value === 'uncompleted'){
-                    for(let i = 0; i < ListaTarefas.length; i++){
-                        if(ListaTarefas[i].Status == 'completed'){
-                            Div = document.querySelector('#Div'+ListaTarefas[i].id);
-                            Div.classList.add('ocult');
-                        }
-                        if(ListaTarefas[i].Status == 'uncompleted'){
-                            Div = document.querySelector('#Div'+ListaTarefas[i].id);
-                            Div.classList.remove('ocult');
-                        }
-                    }       
+                    // Adciona a classe para remover a ocultar todas as tarefas
+                    Filtred = ListaTarefas;
+                    Filtred.forEach(linha =>{
+                        Div = document.querySelector('#Div'+linha.id);
+                        Div.classList.add('ocult');
+                    });
+                    // Remove a classe que oculta o HTML somente dos não completados
+                    Filtred = ListaTarefas.filter(element => element.Status == 'uncompleted');
+                    Filtred.forEach(linha =>{
+                    Div = document.querySelector('#Div'+linha.id);
+                    Div.classList.remove('ocult');
+                    });    
                 } 
             }
         }
