@@ -1,24 +1,31 @@
-const ListaTarefas = Array();
+const ListaTarefas = ObtemListaTarefaStorega();
 const formulario = document.querySelector('form');
 const Lista = document.querySelector('#lista_tarefas');
+let Dados
 
-
+let logado = sessionStorage.getItem('Logado');
+let login = JSON.parse(logado);
+if(login !== true){
+    window.location = 'login.html'
+}
 formulario.addEventListener('submit', (evento) =>{
     evento.preventDefault();
-    GravarTarefa();
-    console.log(ListaTarefas);
+
+    let Tarefa = formulario.querySelector('#tarefa').value;
+    
+    if(verifcar(Tarefa)){
+        GravarTarefa(Tarefa);
+        Criartarefa(Dados.Tarefa, Dados.id); 
+    }
     formulario.reset();
 });
-// Função que verifica e grava
-function GravarTarefa(){
-    let Tarefa = formulario.querySelector('#tarefa').value;
-    let Status = 'uncompleted'
-
-    if(verifcar(Tarefa)){
-        Dados = {id:ListaTarefas.length + 1, Tarefa:Tarefa, 'Status':Status};
-        ListaTarefas.push(Dados);
-        Criartarefa(Dados.Tarefa);
-    }
+// Funçãa para gravar a Tarefa
+function GravarTarefa(Tarefa){
+    let Status = 'uncompleted';
+    Dados = {id:ListaTarefas.length + 1, Tarefa:Tarefa, 'Status':Status};
+    ListaTarefas.push(Dados);
+    AtualizaListaTarefaStorega()
+    return Dados
 }
 // Função para verificar o campo //
 function verifcar(campo){
@@ -26,23 +33,23 @@ function verifcar(campo){
         alert('Preencha o campo da Tarefa');
         return false;
     }
-    else return true;
+    return true;
 }
 // Criação do elemento HTML //
-function Criartarefa(Nome_Tarefa, vetor){
+function Criartarefa(Dados,length){
 
         // Tag li que contem o Nome da Tarefa criada
         let Li1 = document.createElement('li');
         Li1.className = 'todo-item';
-        Li1.innerHTML = Nome_Tarefa;
-        Li1.id = ListaTarefas.length;
+        Li1.innerHTML = Dados;
+        Li1.id = length;
 
         //Botão Check
         let = I1 = document.createElement('i');
         I1.className = 'fas fa-check';
         let Btn1 = document.createElement('button');
         Btn1.className = 'check-btn';
-        Btn1.id = ListaTarefas.length;
+        Btn1.id = length;
         Btn1.append(I1);
         // Evento completar tarefa
         Btn1.addEventListener('click', (b)=>{
@@ -55,7 +62,7 @@ function Criartarefa(Nome_Tarefa, vetor){
         let = I2 = document.createElement('i');
         I2.className = 'fas fa-trash';
         let Btn2 = document.createElement('button');
-        Btn2.id = ListaTarefas.length;
+        Btn2.id = length;
         Btn2.className = 'trash-btn';
         Btn2.append(I2);
         // Evento para remover a tarefa criada//
@@ -69,7 +76,7 @@ function Criartarefa(Nome_Tarefa, vetor){
         });
         // Div que contém todo o HTML criado
         let Div = document.createElement('div');
-        Div.id = 'Div'+ ListaTarefas.length;
+        Div.id = 'Div'+ length;
         Div.className = 'todo';
         Div.append(Li1);
         Div.append(Btn1);
@@ -81,67 +88,76 @@ function Criartarefa(Nome_Tarefa, vetor){
 // Função do botão para completar a Tarefa
 function CompletarTarefa(Id){
     // Muda o Status para 'completed'
-    for(let i = 0; i < ListaTarefas.length; i++){
-        if(ListaTarefas[i].id == Id){
-            ListaTarefas[i].Status = 'completed';
-            console.log(ListaTarefas[i]);
-        }
-    }
+    let Tarefa_Completa
+    Tarefa_Completa =  ListaTarefas.filter(element => element.id == Id);
+    Tarefa_Completa.forEach(linha =>{
+        linha.Status = 'completed'
+    })
 }
 // Funçoes do botão de remover
 function RemoveDaLista(Id){
-    for(let i = 0; i < ListaTarefas.length; i++){
-        if(ListaTarefas[i].id == Id){
-            ListaTarefas.splice(i, 1);
-        }
-    }
+    let rmv = ListaTarefas.findIndex((item) => item.id ==  Id)
+    ListaTarefas.splice(rmv, 1);
+    AtualizaListaTarefaStorega()
 }
 function RemoveHTML(Id){
     let Div_remover = document.querySelector('#Div'+ Id);
-    Lista.removeChild(Div_remover);  
+    Lista.removeChild(Div_remover);
 }
 // Filtro 
 const filtro = document.querySelector('#Filtro');
     Filtred = []
+    Filtred = ListaTarefas
     filtro.addEventListener('change', ()=>{
         if(filtro.value === 'all'){
-            // Remove a classe que oculta o HTML de todos os itens caso tenha
-            Filtred = ListaTarefas;
-            Filtred.forEach(linha =>{
-                Div = document.querySelector('#Div'+linha.id);
-                Div.classList.remove('ocult');
-            });
+            Filtred = ListaTarefas
+            remove(Filtred);
         }
         else{
             if(filtro.value === 'completed'){
-                // Adciona a classe para remover a ocultar todas as tarefas
-                Filtred = ListaTarefas;
-                Filtred.forEach(linha =>{
-                    Div = document.querySelector('#Div'+linha.id);
-                    Div.classList.add('ocult');
-                })
-                // Remove a classe que oculta o HTML somente dos completados
+                adiciona(Filtred);
                 Filtred = ListaTarefas.filter(element => element.Status == 'completed');
-                Filtred.forEach(linha =>{
-                    Div = document.querySelector('#Div'+linha.id);
-                    Div.classList.remove('ocult');
-                });
+                remove(Filtred);
             }
             else{
                 if(filtro.value === 'uncompleted'){
-                    // Adciona a classe para remover a ocultar todas as tarefas
-                    Filtred = ListaTarefas;
-                    Filtred.forEach(linha =>{
-                        Div = document.querySelector('#Div'+linha.id);
-                        Div.classList.add('ocult');
-                    });
-                    // Remove a classe que oculta o HTML somente dos não completados
+                    adiciona(Filtred);
                     Filtred = ListaTarefas.filter(element => element.Status == 'uncompleted');
-                    Filtred.forEach(linha =>{
-                    Div = document.querySelector('#Div'+linha.id);
-                    Div.classList.remove('ocult');
-                    });    
+                    remove(Filtred);
                 } 
             }
         }
+});
+// Adiciona a classe que oculta os itens
+function adiciona(Filtro){
+    Filtro.forEach(linha =>{
+        let Div = document.querySelector('#Div'+ linha.id);
+        Div.classList.add('ocult');
     });
+}
+// Remove a classe que oculta os itens
+function remove(Filtro){
+    Filtro.forEach(linha =>{
+        let Div = document.querySelector('#Div'+linha.id);
+        Div.classList.remove('ocult');
+    });
+}
+function inicializaDom(){
+    if(ListaTarefas.length > 0){
+        for(let i = 0; i < ListaTarefas.length; i++){
+            Criartarefa(ListaTarefas[i].Tarefa,ListaTarefas[i].id);
+        }
+    }
+}
+function AtualizaListaTarefaStorega(){
+    sessionStorage.setItem('Tarefas',JSON.stringify(ListaTarefas));
+}
+function ObtemListaTarefaStorega(){
+    let aux = sessionStorage.getItem('Tarefas');
+    if(aux){
+        return JSON.parse(aux);
+    }else{
+        return Array();
+    }
+}
+inicializaDom();
