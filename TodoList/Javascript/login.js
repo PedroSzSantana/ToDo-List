@@ -1,20 +1,42 @@
 const formulario = document.querySelector('form');
 
-let login_email = 'admim';
-let login_senha = '123';
+let user_valido = 'adm';
+let senha_valida = '123';
 
 formulario.addEventListener('submit', (evento)=>{
+    let User = formulario.querySelector('#user').value
+    let Senha = formulario.querySelector('#senha').value
     evento.preventDefault();
-    validacao();
+    if(VerificaCampo(User,Senha)){
+        ValidaCampos(User, Senha);
+    }
     formulario.reset();
 });
-function validacao(){
-    let email = formulario.querySelector('#email').value;
-    let senha = formulario.querySelector('#senha').value;
-    if(senha === login_senha && email === login_email){
-        alert('Login realizado com sucesso')
+const ValidaCampos = (User, Senha)=>{
 
-        sessionStorage.setItem('Logado',true);
-        window.location = 'index.html'
-    }else{alert('Email ou senha incorreto!'); sessionStorage.setItem('Logado',false)} 
+    if(User === user_valido && Senha === senha_valida){
+        alert('Login realizado com sucesso!')
+        sessionStorage.setItem('Logado', true);
+        window.location ='index.html'
+    }else{
+        alert('Usuário ou Senha invalido!');
+        sessionStorage.setItem('Logado', false);
+    }
+}
+const VerificaCampo = (User,Senha) =>{
+    if(User == '' && Senha == ''){
+        alert('Por Favor preencha os campos!');
+        return false
+    }else{
+        if(User == ''){
+            alert('Preencha o campo do Usuário');
+            return false;
+            }else{
+                if(Senha == ''){
+                    alert('Preencha o campo Senha');
+                    return false;
+                }
+                else return true
+            }
+    }
 }

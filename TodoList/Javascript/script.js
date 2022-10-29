@@ -1,163 +1,148 @@
-const ListaTarefas = ObtemListaTarefaStorega();
 const formulario = document.querySelector('form');
-const Lista = document.querySelector('#lista_tarefas');
-let Dados
+const ListaDeTarefas = RecebeListaTarefas();
+const ListaHTML = document.querySelector('#lista');
 
 let logado = sessionStorage.getItem('Logado');
 let login = JSON.parse(logado);
-if(login !== true){
-    window.location = 'login.html'
+if(login != true){
+    window.location = 'Login.html'
 }
-formulario.addEventListener('submit', (evento) =>{
-    evento.preventDefault();
+formulario.addEventListener('submit', (evento)=>{
+    let Tarefa = formulario.querySelector('#tarefa').value
 
-    let Tarefa = formulario.querySelector('#tarefa').value;
-    
-    if(verifcar(Tarefa)){
-        GravarTarefa(Tarefa);
-        Criartarefa(Dados.Tarefa, Dados.id); 
+    evento.preventDefault();
+    if(VerificaCampo(Tarefa)){
+        SalvaDados(Tarefa);
+        CriaHTML(Tarefa, ListaDeTarefas.length);
+        atualizaStorage()
     }
     formulario.reset();
 });
-// Funçãa para gravar a Tarefa
-function GravarTarefa(Tarefa){
-    let Status = 'uncompleted';
-    Dados = {id:ListaTarefas.length + 1, Tarefa:Tarefa, 'Status':Status};
-    ListaTarefas.push(Dados);
-    AtualizaListaTarefaStorega()
-    return Dados
+// Salva os dados num objeto
+const SalvaDados = (Tarefa)=>{
+    let Dados = {id:ListaDeTarefas.length + 1, Tarefa:Tarefa, Status:'uncompleted'}
+    ListaDeTarefas.push(Dados);
 }
-// Função para verificar o campo //
-function verifcar(campo){
-    if(campo == ''){
+// Verifica se o campo Tarefa esta preenchido
+const VerificaCampo = (Tarefa)=>{
+     if(Tarefa == ''){
         alert('Preencha o campo da Tarefa');
-        return false;
-    }
-    return true;
+        return false
+     }else return true;
 }
-// Criação do elemento HTML //
-function Criartarefa(Dados,length){
+// Cria o elemento HTML e o adicina a lista
+const CriaHTML = (Tarefa, id) =>{
+    let li = document.createElement('li');
+        li.classList.add('todo-item');
+        li.id = id
+        li.innerHTML = Tarefa
+    
+    let i1 = document.createElement('i');
+        i1.classList.add('fas');
+        i1.classList.add('fa-check');
 
-        // Tag li que contem o Nome da Tarefa criada
-        let Li1 = document.createElement('li');
-        Li1.className = 'todo-item';
-        Li1.innerHTML = Dados;
-        Li1.id = length;
-
-        //Botão Check
-        let = I1 = document.createElement('i');
-        I1.className = 'fas fa-check';
-        let Btn1 = document.createElement('button');
-        Btn1.className = 'check-btn';
-        Btn1.id = length;
-        Btn1.append(I1);
-        // Evento completar tarefa
-        Btn1.addEventListener('click', (b)=>{
-            let botao1 = b.target
+    let buttonCheck = document.createElement('button');
+        buttonCheck.classList.add('check-btn')
+        buttonCheck.id = id
+        buttonCheck.addEventListener('click',(b)=>{
+            target = b.target;
             Div.classList.add('completed');
-            CompletarTarefa(botao1.id);
-            
+            CompletarTarefa(target.id);
+            atualizaStorage()
         });
-        //Botão Delete
-        let = I2 = document.createElement('i');
-        I2.className = 'fas fa-trash';
-        let Btn2 = document.createElement('button');
-        Btn2.id = length;
-        Btn2.className = 'trash-btn';
-        Btn2.append(I2);
-        // Evento para remover a tarefa criada//
-        Btn2.addEventListener('click', (b)=>{
-            let Botao2 = b.target;
-            Div.classList.add('fall');
-            setTimeout(() => { 
-                RemoveDaLista(Botao2.id);
-                RemoveHTML(Botao2.id);
-            }, 450);
-        });
-        // Div que contém todo o HTML criado
-        let Div = document.createElement('div');
-        Div.id = 'Div'+ length;
-        Div.className = 'todo';
-        Div.append(Li1);
-        Div.append(Btn1);
-        Div.append(Btn2);
+        buttonCheck.append(i1);
+    
+    let i2 = document.createElement('i');
+        i2.classList.add('fas');
+        i2.classList.add('fa-trash');
 
-        // Adição da div ao HTML dentro da lista não ordena (ul)
-        Lista.append(Div);
+    let buttonRemove = document.createElement('button');
+        buttonRemove.classList.add('trash-btn');
+        buttonRemove.id = id
+        buttonRemove.addEventListener('click', (b) =>{
+            target = b.target
+            Div.classList.add('fall');
+            setTimeout(() =>{
+                RemoveDaLista(target.id);
+                RemoveHTML(target.id)
+            },500);
+            atualizaStorage();
+        });
+        buttonRemove.append(i2);
+
+    let Div = document.createElement('div');
+        Div.classList.add('todo');
+        Div.id = 'Div' + id;
+        Div.append(li);
+        Div.append(buttonCheck);
+        Div.append(buttonRemove);
+
+    ListaHTML.append(Div);
 }
-// Função do botão para completar a Tarefa
-function CompletarTarefa(Id){
-    // Muda o Status para 'completed'
-    let Tarefa_Completa
-    Tarefa_Completa =  ListaTarefas.filter(element => element.id == Id);
-    Tarefa_Completa.forEach(linha =>{
+// Funções do Botão Remover
+const RemoveHTML = (id)=>{
+    let Div_remover = document.querySelector('#Div'+id)
+    ListaHTML.removeChild(Div_remover);
+}
+const RemoveDaLista = (id)=>{
+    let rmv = ListaDeTarefas.filter(element => element.id == id)
+
+        ListaDeTarefas.splice(rmv, 1);
+}
+// Função para alterar os Status para completed
+const CompletarTarefa = (id)=>{
+    let Tarefa_Completa = ListaDeTarefas.filter(element => element.id == id);
+    Tarefa_Completa.forEach(linha => {
         linha.Status = 'completed'
+    });
+}
+const Filtro = formulario.querySelector('#filtro');
+Filtro.addEventListener('change', ()=>{
+    Filtred = ListaDeTarefas;
+    switch(Filtro.value){
+        case 'all' :    FiltroRemoveHTML();
+                        FiltroCriaHTML(Filtred);
+
+        break;
+        case 'completed' : FiltroRemoveHTML();
+                            Filtred = ListaDeTarefas.filter(element => element.Status == 'completed');
+                            FiltroCriaHTML(Filtred);
+        break;
+        default :   FiltroRemoveHTML();
+                    Filtred = ListaDeTarefas.filter(element => element.Status == 'uncompleted');
+                    FiltroCriaHTML(Filtred);
+        break;
+    }
+});
+const FiltroRemoveHTML = ()=>{
+    ListaHTML.innerHTML = "";
+}
+const FiltroCriaHTML = (Filtro) =>{
+    Filtro.forEach(linha => {
+        CriaHTML(linha.Tarefa, linha.id);
+        if(linha.Status == 'completed'){
+            let Div = document.querySelector('#Div' + linha.id);
+            Div.classList.add('completed')
+        }
     })
 }
-// Funçoes do botão de remover
-function RemoveDaLista(Id){
-    let rmv = ListaTarefas.findIndex((item) => item.id ==  Id)
-    ListaTarefas.splice(rmv, 1);
-    AtualizaListaTarefaStorega()
+function atualizaStorage(){
+    sessionStorage.setItem('Tarefas', JSON.stringify(ListaDeTarefas));
 }
-function RemoveHTML(Id){
-    let Div_remover = document.querySelector('#Div'+ Id);
-    Lista.removeChild(Div_remover);
-}
-// Filtro 
-const filtro = document.querySelector('#Filtro');
-    Filtred = []
-    Filtred = ListaTarefas
-    filtro.addEventListener('change', ()=>{
-        if(filtro.value === 'all'){
-            Filtred = ListaTarefas
-            remove(Filtred);
-        }
-        else{
-            if(filtro.value === 'completed'){
-                adiciona(Filtred);
-                Filtred = ListaTarefas.filter(element => element.Status == 'completed');
-                remove(Filtred);
-            }
-            else{
-                if(filtro.value === 'uncompleted'){
-                    adiciona(Filtred);
-                    Filtred = ListaTarefas.filter(element => element.Status == 'uncompleted');
-                    remove(Filtred);
-                } 
-            }
-        }
-});
-// Adiciona a classe que oculta os itens
-function adiciona(Filtro){
-    Filtro.forEach(linha =>{
-        let Div = document.querySelector('#Div'+ linha.id);
-        Div.classList.add('ocult');
-    });
-}
-// Remove a classe que oculta os itens
-function remove(Filtro){
-    Filtro.forEach(linha =>{
-        let Div = document.querySelector('#Div'+linha.id);
-        Div.classList.remove('ocult');
-    });
+function RecebeListaTarefas(){
+    let aux = sessionStorage.getItem('Tarefas');
+    if(aux) return JSON.parse(aux);
+    else return Array();
 }
 function inicializaDom(){
-    if(ListaTarefas.length > 0){
-        for(let i = 0; i < ListaTarefas.length; i++){
-            Criartarefa(ListaTarefas[i].Tarefa,ListaTarefas[i].id);
+    if(ListaDeTarefas.length > 0){
+        ListaDeTarefas.forEach(linha =>{
+        CriaHTML(linha.Tarefa, linha.id);
+        if(linha.Status == 'completed'){
+            let Div = document.querySelector('#Div' + linha.id);
+            Div.classList.add('completed')
         }
-    }
-}
-function AtualizaListaTarefaStorega(){
-    sessionStorage.setItem('Tarefas',JSON.stringify(ListaTarefas));
-}
-function ObtemListaTarefaStorega(){
-    let aux = sessionStorage.getItem('Tarefas');
-    if(aux){
-        return JSON.parse(aux);
-    }else{
-        return Array();
+        })
     }
 }
 inicializaDom();
