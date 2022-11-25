@@ -1,5 +1,5 @@
 # ToDo-List
 Projeto Academico com foco em Jvascript.
 <p>Criação de uma lista de tarefas utilizando Js para criação do dom, </p>
-<p>e tela de login com confirmção simple, e a utilização do webStorage,  </p>
+<p>e tela de login com confirmação simples, e a utilização do webStorage  </p>
 <p>para armazenar os dados da lista utilizando localSotorage, e sessionStorage para armazernar o login durante a sessão.  </p>
